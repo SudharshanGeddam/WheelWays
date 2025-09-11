@@ -19,7 +19,7 @@ class RegisterState extends State<StatefulWidget> {
           Dialog(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadiusGeometry.circular(12.0), 
+              borderRadius: BorderRadiusGeometry.circular(12.0),
             ),
             child: Padding(
               padding: EdgeInsets.all(12.0),
@@ -50,6 +50,7 @@ class RegisterState extends State<StatefulWidget> {
                         textCapitalization: TextCapitalization.none,
                         decoration: InputDecoration(
                           label: Text('Employee Id'),
+                          prefixIcon: Icon(Icons.person_2_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
@@ -60,7 +61,7 @@ class RegisterState extends State<StatefulWidget> {
                         textCapitalization: TextCapitalization.none,
                         decoration: InputDecoration(
                           label: Text('Role'),
-                          prefixIcon: Icon(Icons.person_2_outlined),
+                          prefixIcon: Icon(Icons.admin_panel_settings_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
@@ -112,7 +113,7 @@ class RegisterState extends State<StatefulWidget> {
                           ),
                         ),
                       ),
-                      
+
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context);
@@ -122,6 +123,7 @@ class RegisterState extends State<StatefulWidget> {
                           style: GoogleFonts.montserrat(
                             fontSize: 16,
                             fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),

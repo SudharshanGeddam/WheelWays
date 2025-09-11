@@ -96,6 +96,7 @@ class LoginState extends State<StatefulWidget> {
                           style: GoogleFonts.montserrat(
                             fontSize: 16,
                             fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
