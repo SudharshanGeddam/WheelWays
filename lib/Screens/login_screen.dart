@@ -18,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 class LoginState extends State<LoginScreen> {
   FirebaseFirestore db = FirebaseFirestore.instance;
   bool isLoading = false;
-  bool isLogin = false;
+  bool isLoginState = false;
 
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -30,47 +30,38 @@ class LoginState extends State<LoginScreen> {
   ) async {
     try {
       if (!_formKey.currentState!.validate()) return;
-      setState(() {
-        isLoading = true;
-      });
+      setState(() => isLoading = true);
       final UserCredential credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: emailAddress, password: password);
-      setState(() {
-        isLoading = false;
-        isLogin = true;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Login Successful.')));
-        String uid = credential.user!.uid;
-        if (isLogin) {
-          getUserRole(uid);
-        }
-      });
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      if (e.code == 'user-not-found') {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('User not registered.')));
-        setState(() {
-          isLoading = false;
-        });
-      } else if (e.code == 'wrong-password') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please check your password and try again.')),
-        );
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } catch (e) {
+      setState(() => isLoading = false);
+      isLoginState = true;
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
+      ).showSnackBar(SnackBar(content: Text('Login Successful.')));
+      String uid = credential.user!.uid;
+      if (isLoginState) {
+        getUserRole(uid);
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() => isLoading = false);
+      if (!mounted) return;
+      final message = (e.code == 'user-not-found')
+          ? 'User not registered.'
+          : (e.code == 'wrong-password')
+          ? 'Please check your password and try again.'
+          : 'Login failed.';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    } catch (e) {
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(
+        context,
       ).showSnackBar(SnackBar(content: Text('Something went wrong')));
-      setState(() {
-        isLoading = false;
-      });
+    } finally
+    {
+      setState(() => isLoading = false);
     }
   }
 
@@ -82,12 +73,12 @@ class LoginState extends State<LoginScreen> {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
         String role = data['role'];
         if (!mounted) return;
-        if (role == 'Admin' || role == 'admin') {
+        if (role.toLowerCase() == 'admin') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => AdminHome()),
           );
-        } else if (role == 'Employee' || role == 'employee') {
+        } else if (role.toLowerCase() == 'employee') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => EmployeeHome()),

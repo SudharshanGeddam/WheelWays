@@ -32,46 +32,43 @@ class RegisterState extends State<RegisterScreen> {
   ) async {
     try {
       if (!_formKey.currentState!.validate()) return;
-      setState(() {
-        isLoading = true;
-      });
+      setState(() => isLoading = true);
       final UserCredential credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
             email: emailAddress,
             password: password,
           );
       String uid = credential.user!.uid;
-      setState(() {
-        isLoading = false;
-        isUserCreated = true;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Registeration Successful.')));
-      });
+      setState(() => isLoading = false);
+      if (!mounted) return;
+      isUserCreated = true;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Registeration Successful.')));
       if (isUserCreated) {
         storeUserDetails(uid, empId, role, email);
-        if (!mounted) return;
         Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {
+      setState(() => isLoading = false);
       if (!mounted) return;
-      if (e.code == 'weak-password') {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Password is too weak")));
-      } else if (e.code == 'email-already-in-use') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("User with this mail already exists.")),
-        );
-      }
+
+      final message = (e.code == 'weak-password')
+          ? 'Password is too weak'
+          : (e.code == 'email-already-in-use')
+          ? 'User already exists.'
+          : 'Registeration Failed';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
-      if (!mounted) return;
+      setState(() => isLoading = false);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Something went wrong')));
-      setState(() {
-        isLoading = false;
-      });
+    }
+    finally {
+      setState(() => isLoading = false);
     }
   }
 
