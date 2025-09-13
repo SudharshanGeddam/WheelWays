@@ -1,0 +1,133 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
+
+class PaginatedListScreen extends StatefulWidget {
+  const PaginatedListScreen({super.key});
+
+  @override
+  State<PaginatedListScreen> createState() => _PaginatedListScreenState();
+}
+
+class _PaginatedListScreenState extends State<PaginatedListScreen> {
+  final ScrollController _scrollController = ScrollController();
+  final int _limit = 10;
+
+  List<DocumentSnapshot> bikes = [];
+  DocumentSnapshot? lastDoc;
+  bool isLoading = false;
+  bool hasMore = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBikes();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          !isLoading &&
+          hasMore) {
+        _fetchBikes();
+      }
+    });
+  }
+
+  Future<void> _fetchBikes() async {
+    if (isLoading) return;
+
+    setState(() => isLoading = true);
+
+    Query query = FirebaseFirestore.instance
+        .collection('BikesData')
+        .orderBy('createdAt', descending: true)
+        .limit(_limit);
+
+    if (lastDoc != null) {
+      query = query.startAfterDocument(lastDoc!);
+    }
+
+    QuerySnapshot querySnapshot = await query.get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      lastDoc = querySnapshot.docs.last;
+      setState(() {
+        bikes.addAll(querySnapshot.docs);
+      });
+
+      if (querySnapshot.docs.length < _limit) {
+        hasMore = false;
+      }
+    } else {
+      hasMore = false;
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: bikes.length + 1,
+      itemBuilder: (context, index) {
+        if (index < bikes.length) {
+          var data = bikes[index].data() as Map<String, dynamic>;
+          return Card(
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Image.asset('assets/images/bike_img.jpg', height: 40),
+                      const SizedBox(width: 10),
+                      Text('HCL Bikes'),
+
+                    ],
+                  ),
+                  const SizedBox(height: 5,),
+                  Text('Color: ${data['bikeColor']}'),
+                  const SizedBox(height: 5,),
+                  Text('Bike Id: ${data['bikeId']}' ),
+                  const SizedBox(height: 5,),
+                  Text('Location: ${data['bikeLocation']}'),
+                  const SizedBox(height: 5,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(onPressed: () {
+                        
+                      }, child: Text('Request'),),
+                      const SizedBox(width: 10,),
+                      ElevatedButton(onPressed: () {
+                        
+                      }, child: Text('Return'),),
+                    ],
+                  )
+
+                ],
+              ),
+            ),
+          );
+        } else {
+          return hasMore
+              ? Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Lottie.asset(
+                      'assets/lotties/Loading.json',
+                      width: 250,
+                      height: 250,
+                    ),
+                  ),
+                )
+              : SizedBox();
+        }
+      },
+    );
+  }
+}

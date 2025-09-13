@@ -22,7 +22,7 @@ class RegisterState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  String get empId => _idController.text.trim();
+  String get empName => _idController.text.trim();
   String get role => _roleController.text.trim();
   String get email => _emailController.text.trim();
 
@@ -46,7 +46,7 @@ class RegisterState extends State<RegisterScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('Registeration Successful.')));
       if (isUserCreated) {
-        storeUserDetails(uid, empId, role, email);
+        storeUserDetails(uid, empName, role, email);
         Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {
@@ -74,13 +74,13 @@ class RegisterState extends State<RegisterScreen> {
 
   Future<void> storeUserDetails(
     String uid,
-    String empId,
+    String empName,
     String role,
     String email,
   ) async {
     try {
       await db.collection('users').doc(uid).set({
-        'employeeId': empId,
+        'employeeName': empName,
         'role': role,
         'email': email,
         'createdAt': FieldValue.serverTimestamp(),
@@ -144,7 +144,7 @@ class RegisterState extends State<RegisterScreen> {
                         textCapitalization: TextCapitalization.none,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
-                          label: Text('Employee Id'),
+                          label: Text('User Name'),
                           prefixIcon: Icon(Icons.person_2_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
