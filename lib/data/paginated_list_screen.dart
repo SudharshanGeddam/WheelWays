@@ -83,7 +83,7 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
                 children: [
                   Row(
                     children: [
-                      Image.asset('assets/images/bike_img.jpg', height: 40),
+                      Image.asset('assets/images/bike_img.jpg', height: 40, fit: BoxFit.cover,),
                       const SizedBox(width: 10),
                       Text('HCL Bikes'),
 
