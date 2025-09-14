@@ -49,12 +49,27 @@ class _SecurityHomeState extends State<SecurityHome> {
     String location,
   ) async {
     try {
-      await db.collection('BikesData').add({
-        'bikeId': bikeId,
-        'bikeColor': bikeColor,
-        'bikeLocation': location,
-        'createdAt' : FieldValue.serverTimestamp(),
-      });
+      final DocumentReference bikeRef = db.collection('BikesData').doc(bikeId);
+      final DocumentSnapshot bikeSnapshot = await bikeRef.get();
+      if (!mounted) return;
+      if (bikeSnapshot.exists) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Bike with this ID already exists.')),
+        );
+      } else {
+        await db.collection('BikesData').doc(bikeId).set({
+          'bikeId': bikeId,
+          'bikeColor': bikeColor,
+          'bikeLocation': location,
+          'isAllocated': false,
+          'isDamaged': false,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Bike added Successfully')));
+      }
     } catch (e) {
       print(e);
     }
@@ -78,7 +93,7 @@ class _SecurityHomeState extends State<SecurityHome> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Hello $userName! Welcome.'),
+             (userName != null)? Text('Hello $userName! Welcome.') : Text('Hello User! Welcome.'),
               const SizedBox(height: 20),
               Container(
                 padding: EdgeInsets.all(12.0),
@@ -94,84 +109,86 @@ class _SecurityHomeState extends State<SecurityHome> {
                     ),
                   ],
                 ),
-                child: Column(
-                  children: [
-                    Form(
-                      key: _formKey,
-                      child: TextFormField(
-                        controller: _idController,
-                        textCapitalization: TextCapitalization.none,
-                        validator: (value) =>
-                            value!.isEmpty ? 'Id required' : null,
-                        decoration: InputDecoration(
-                          label: Text('Bike Id'),
-                          prefixIcon: Icon(Icons.add_circle_outline),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        label: Text('Choose color'),
-                        prefixIcon: Icon(Icons.color_lens_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      initialValue: choosenColor,
-                      items: selectedColor.map((val) {
-                        return DropdownMenuItem(value: val, child: Text(val));
-                      }).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          choosenColor = value;
-                        });
-                      },
-                      validator: (value) =>
-                          value == null ? 'Please choose a color' : null,
-                    ),
-                    const SizedBox(height: 10),
-                    TextFormField(
-                      controller: _bikeLocation,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: 
+                    [
+                      TextFormField(
+                      controller: _idController,
                       textCapitalization: TextCapitalization.none,
                       validator: (value) =>
-                          value!.isEmpty ? 'Mention Location' : null,
+                          value!.isEmpty ? 'Id required' : null,
                       decoration: InputDecoration(
-                        label: Text('Bike Location'),
-                        prefixIcon: Icon(Icons.location_on_outlined),
+                        label: Text('Bike Id'),
+                        prefixIcon: Icon(Icons.add_circle_outline),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Padding(
-                      padding: EdgeInsetsGeometry.only(left: 250),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            storeBikeDetails(
-                              _idController.text.trim(),
-                              choosenColor!,
-                              _bikeLocation.text.trim(),
-                            );
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Bike added Successfully'),
-                              ),
-                            );
-                            _idController.clear();
-                            _bikeLocation.clear();
-                            setState(() => choosenColor = null);
-                          }
-                        },
-                        child: Text('Add Bike'),
-                      ),
+                    const SizedBox(height: 10,),
+                    DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    label: Text('Choose color'),
+                    prefixIcon: Icon(Icons.color_lens_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
-                  ],
+                  ),
+                  initialValue: choosenColor,
+                  items: selectedColor.map((val) {
+                    return DropdownMenuItem(value: val, child: Text(val));
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      choosenColor = value;
+                    });
+                  },
+                  validator: (value) =>
+                      value == null ? 'Please choose a color' : null,
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _bikeLocation,
+                  textCapitalization: TextCapitalization.none,
+                  validator: (value) =>
+                      value!.isEmpty ? 'Mention Location' : null,
+                  decoration: InputDecoration(
+                    label: Text('Bike Location'),
+                    prefixIcon: Icon(Icons.location_on_outlined),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        storeBikeDetails(
+                          _idController.text.trim(),
+                          choosenColor!,
+                          _bikeLocation.text.trim(),
+                        );
+                  
+                        setState(() {
+                          choosenColor = null;
+                          _idController.clear();
+                          _bikeLocation.clear();
+                        });
+                      }
+                    },
+                    child: Text('Add Bike'),
+                  ),
+                ),
+                    ],
+                  ),
+                
+                
+    
                 ),
               ),
               const SizedBox(height: 10),
@@ -181,7 +198,7 @@ class _SecurityHomeState extends State<SecurityHome> {
                   children: [
                     Chip(label: Text('Available Bikes')),
                     const SizedBox(width: 10),
-                    Chip(label: Text('Bike Requests')),
+                    Chip(label: Text('Bike Allocated')),
                     const SizedBox(width: 10),
                     Chip(label: Text('Return Requests')),
                     const SizedBox(width: 10),

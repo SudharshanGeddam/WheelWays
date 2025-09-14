@@ -15,6 +15,7 @@ class _EmployeeHomeState extends State<EmployeeHome> {
   FirebaseFirestore db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+
   String? userName;
   Future<void> getCurrentUserId() async {
     try {
@@ -38,6 +39,7 @@ class _EmployeeHomeState extends State<EmployeeHome> {
   void initState() {
     super.initState();
     getCurrentUserId();
+
   }
 
   @override
@@ -49,21 +51,15 @@ class _EmployeeHomeState extends State<EmployeeHome> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hello $userName! Welcome.'),
+            (userName != null) ? Text('Hello $userName! Welcome.') : Text('Hello User! Welcome.'),
             const SizedBox(height: 10),
             Center(
               child: Container(
                 padding: EdgeInsets.all(12.0),
                 child: Column(
                   children: [
-                    SizedBox(
-                      width: 250,
-                      height: 250,
-                      child: Lottie.asset(
-                        'assets/lotties/Bycicle delivery fast.json',
-                      ),
-                    ),
-                    Text('Ride Safe, Ride with Caution'),
+                    SizedBox(width: 250, height: 250, child:Lottie.asset('assets/lotties/Bycicle delivery fast.json'),),
+                    const Text('Ride Safe, Ride with Caution'),
                   ],
                 ),
               ),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:wheelways/pages/request_page.dart';
 
 class PaginatedListScreen extends StatefulWidget {
   const PaginatedListScreen({super.key});
@@ -11,6 +12,7 @@ class PaginatedListScreen extends StatefulWidget {
 
 class _PaginatedListScreenState extends State<PaginatedListScreen> {
   final ScrollController _scrollController = ScrollController();
+  final FirebaseFirestore db = FirebaseFirestore.instance;
   final int _limit = 10;
 
   List<DocumentSnapshot> bikes = [];
@@ -24,7 +26,7 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
     _fetchBikes();
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
+      if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent &&
           !isLoading &&
           hasMore) {
@@ -38,33 +40,39 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
 
     setState(() => isLoading = true);
 
-    Query query = FirebaseFirestore.instance
-        .collection('BikesData')
-        .orderBy('createdAt', descending: true)
-        .limit(_limit);
+    try {
+      Query query = db
+          .collection('BikesData')
+          .orderBy('createdAt', descending: true)
+          .where('isAllocated', isEqualTo: false)
+          .where('isDamaged', isEqualTo: false)
+          .limit(_limit);
 
-    if (lastDoc != null) {
-      query = query.startAfterDocument(lastDoc!);
-    }
+      if (lastDoc != null) {
+        query = query.startAfterDocument(lastDoc!);
+      }
 
-    QuerySnapshot querySnapshot = await query.get();
+      QuerySnapshot querySnapshot = await query.get();
 
-    if (querySnapshot.docs.isNotEmpty) {
-      lastDoc = querySnapshot.docs.last;
-      setState(() {
-        bikes.addAll(querySnapshot.docs);
-      });
+      if (querySnapshot.docs.isNotEmpty) {
+        lastDoc = querySnapshot.docs.last;
+        setState(() {
+          bikes.addAll(querySnapshot.docs);
+        });
 
-      if (querySnapshot.docs.length < _limit) {
+        if (querySnapshot.docs.length < _limit) {
+          hasMore = false;
+        }
+      } else {
         hasMore = false;
       }
-    } else {
-      hasMore = false;
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override
@@ -83,32 +91,45 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
                 children: [
                   Row(
                     children: [
-                      Image.asset('assets/images/bike_img.jpg', height: 40, fit: BoxFit.cover,),
+                      Image.asset(
+                        'assets/images/bike_img.jpg',
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
                       const SizedBox(width: 10),
-                      Text('HCL Bikes'),
-
+                      const Text('HCL Bikes'),
                     ],
                   ),
-                  const SizedBox(height: 5,),
+                  const SizedBox(height: 5),
                   Text('Color: ${data['bikeColor']}'),
-                  const SizedBox(height: 5,),
-                  Text('Bike Id: ${data['bikeId']}' ),
-                  const SizedBox(height: 5,),
+                  const SizedBox(height: 5),
+                  Text('Bike Id: ${data['bikeId']}'),
+                  const SizedBox(height: 5),
                   Text('Location: ${data['bikeLocation']}'),
-                  const SizedBox(height: 5,),
+                  const SizedBox(height: 5),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      ElevatedButton(onPressed: () {
-                        
-                      }, child: Text('Request'),),
-                      const SizedBox(width: 10,),
-                      ElevatedButton(onPressed: () {
-                        
-                      }, child: Text('Return'),),
-                    ],
-                  )
+                      ElevatedButton(
+                        onPressed: () {
+                          db
+                              .collection('BikesData')
+                              .doc(bikes[index].id)
+                              .update({'isAllocated': true});
 
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RequestPage(),
+                            ),
+                          );
+                        },
+                        child: Text('Request'),
+                      ),
+                      const SizedBox(width: 10),
+                      ElevatedButton(onPressed: () {}, child: Text('Return')),
+                    ],
+                  ),
                 ],
               ),
             ),
