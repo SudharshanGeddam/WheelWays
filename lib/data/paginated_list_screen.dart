@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:wheelways/pages/request_page.dart';
@@ -13,6 +14,8 @@ class PaginatedListScreen extends StatefulWidget {
 class _PaginatedListScreenState extends State<PaginatedListScreen> {
   final ScrollController _scrollController = ScrollController();
   final FirebaseFirestore db = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? userName;
   final int _limit = 10;
 
   List<DocumentSnapshot> bikes = [];
@@ -24,6 +27,7 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
   void initState() {
     super.initState();
     _fetchBikes();
+    _getCurrentUserId();
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -33,6 +37,24 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
         _fetchBikes();
       }
     });
+  }
+
+  Future<void> _getCurrentUserId() async {
+    try {
+      if (_auth.currentUser != null) {
+        String uid = _auth.currentUser!.uid;
+        DocumentReference docRef = db.collection('users').doc(uid);
+        DocumentSnapshot snapshot = await docRef.get();
+        if (snapshot.exists) {
+          Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
+          setState(() => userName = userData['employeeName']);
+
+          print(userName);
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> _fetchBikes() async {
@@ -115,15 +137,17 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
                           await db
                               .collection('BikesData')
                               .doc(bikes[index].id)
-                              .update({'isAllocated': true});
+                              .update({'isAllocated': true,
+                              'allocatedTo': userName,});
 
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => RequestPage(
-                                bikeId : data['bikeId'],
-                                bikeColor : data['bikeColor'],
-                                bikeLocation : data['bikeLocation'],
+                                bikeId: data['bikeId'],
+                                bikeColor: data['bikeColor'],
+                                bikeLocation: data['bikeLocation'],
+                                allocatedTo: userName!,
                               ),
                             ),
                           );
