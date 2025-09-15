@@ -46,7 +46,8 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
         DocumentReference docRef = db.collection('users').doc(uid);
         DocumentSnapshot snapshot = await docRef.get();
         if (snapshot.exists) {
-          Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
+          Map<String, dynamic> userData =
+              snapshot.data() as Map<String, dynamic>;
           setState(() => userName = userData['employeeName']);
 
           print(userName);
@@ -137,8 +138,10 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
                           await db
                               .collection('BikesData')
                               .doc(bikes[index].id)
-                              .update({'isAllocated': true,
-                              'allocatedTo': userName,});
+                              .update({
+                                'isAllocated': true,
+                                'allocatedTo': userName,
+                              });
 
                           Navigator.push(
                             context,
