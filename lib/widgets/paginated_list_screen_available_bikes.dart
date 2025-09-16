@@ -2,40 +2,50 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:wheelways/models/fetch_available_bikes.dart';
 import 'package:wheelways/pages/request_page.dart';
 
-class PaginatedListScreen extends StatefulWidget {
-  const PaginatedListScreen({super.key});
+class PaginatedListScreenAvailableBikes extends StatefulWidget {
+  const PaginatedListScreenAvailableBikes({super.key});
 
   @override
-  State<PaginatedListScreen> createState() => _PaginatedListScreenState();
+  State<PaginatedListScreenAvailableBikes> createState() => _PaginatedListScreenState();
 }
 
-class _PaginatedListScreenState extends State<PaginatedListScreen> {
-  final ScrollController _scrollController = ScrollController();
+class _PaginatedListScreenState extends State<PaginatedListScreenAvailableBikes> {
+  late final Fetchavailablebikes fetchavailablebikes;
   final FirebaseFirestore db = FirebaseFirestore.instance;
+  final ScrollController _scrollController = ScrollController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String? userName;
-  final int _limit = 10;
 
-  List<DocumentSnapshot> bikes = [];
-  DocumentSnapshot? lastDoc;
   bool isLoading = false;
-  bool hasMore = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchBikes();
+    fetchavailablebikes = Fetchavailablebikes();
+    _loadMoreBikes();
     _getCurrentUserId();
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
               _scrollController.position.maxScrollExtent &&
           !isLoading &&
-          hasMore) {
-        _fetchBikes();
+          fetchavailablebikes.hasMore) {
+        _loadMoreBikes();
       }
+    });
+  }
+
+  Future<void> _loadMoreBikes() async {
+    if (isLoading || !fetchavailablebikes.hasMore) return;
+    setState(() {
+      isLoading = true;
+    });
+    await fetchavailablebikes.fetchAvailbleBikes();
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -58,54 +68,15 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
     }
   }
 
-  Future<void> _fetchBikes() async {
-    if (isLoading) return;
-
-    setState(() => isLoading = true);
-
-    try {
-      Query query = db
-          .collection('BikesData')
-          .orderBy('createdAt', descending: true)
-          .where('isAllocated', isEqualTo: false)
-          .where('isDamaged', isEqualTo: false)
-          .limit(_limit);
-
-      if (lastDoc != null) {
-        query = query.startAfterDocument(lastDoc!);
-      }
-
-      QuerySnapshot querySnapshot = await query.get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        lastDoc = querySnapshot.docs.last;
-        setState(() {
-          bikes.addAll(querySnapshot.docs);
-        });
-
-        if (querySnapshot.docs.length < _limit) {
-          hasMore = false;
-        }
-      } else {
-        hasMore = false;
-      }
-    } catch (e) {
-      print(e);
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       controller: _scrollController,
-      itemCount: bikes.length + 1,
+      itemCount: fetchavailablebikes.bikes.length + 1,
       itemBuilder: (context, index) {
-        if (index < bikes.length) {
-          var data = bikes[index].data() as Map<String, dynamic>;
+        if (index < fetchavailablebikes.bikes.length) {
+          var data =
+              fetchavailablebikes.bikes[index].data() as Map<String, dynamic>;
           return Card(
             child: Padding(
               padding: EdgeInsets.all(8.0),
@@ -137,7 +108,7 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
                         try {
                           await db
                               .collection('BikesData')
-                              .doc(bikes[index].id)
+                              .doc(fetchavailablebikes.bikes[index].id)
                               .update({
                                 'isAllocated': true,
                                 'allocatedTo': userName,
@@ -166,14 +137,14 @@ class _PaginatedListScreenState extends State<PaginatedListScreen> {
             ),
           );
         } else {
-          return hasMore
+          return isLoading
               ? Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Center(
                     child: Lottie.asset(
                       'assets/lotties/Loading.json',
-                      width: 250,
-                      height: 250,
+                      width: 100,
+                      height: 100,
                     ),
                   ),
                 )

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:wheelways/data/paginated_list_screen.dart';
+import 'package:wheelways/widgets/paginated_list_screen_available_bikes.dart';
 
 class EmployeeHome extends StatefulWidget {
   const EmployeeHome({super.key});
@@ -71,7 +71,7 @@ class _EmployeeHomeState extends State<EmployeeHome> {
               ),
             ),
             const SizedBox(height: 10),
-            Expanded(child: PaginatedListScreen()),
+            Expanded(child: PaginatedListScreenAvailableBikes()),
           ],
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:wheelways/widgets/paginated_list_screen_available_bikes.dart';
 
 class SecurityHome extends StatefulWidget {
   const SecurityHome({super.key});
@@ -10,6 +11,13 @@ class SecurityHome extends StatefulWidget {
 }
 
 class _SecurityHomeState extends State<SecurityHome> {
+  final List<String> filters = [
+    'Available Bikes',
+    'Bike Allocated',
+    'Return Requests',
+    'Damaged',
+  ];
+  late String _selectedFilter;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
@@ -41,6 +49,7 @@ class _SecurityHomeState extends State<SecurityHome> {
   void initState() {
     super.initState();
     getCurrentUserId();
+    _selectedFilter = filters[0];
   }
 
   Future<void> storeBikeDetails(
@@ -63,6 +72,7 @@ class _SecurityHomeState extends State<SecurityHome> {
           'bikeLocation': location,
           'isAllocated': false,
           'isDamaged': false,
+          'isReturned': false,
           'allocatedTo': '',
           'returnBy': '',
           'createdAt': FieldValue.serverTimestamp(),
@@ -74,6 +84,13 @@ class _SecurityHomeState extends State<SecurityHome> {
       }
     } catch (e) {
       print(e);
+    }
+  }
+
+  void _onFilterSelection(String selectedFilter) {
+    switch (selectedFilter) {
+      case 'Available Bikes':
+        PaginatedListScreenAvailableBikes();
     }
   }
 
@@ -192,18 +209,33 @@ class _SecurityHomeState extends State<SecurityHome> {
                 ),
               ),
               const SizedBox(height: 10),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    Chip(label: Text('Available Bikes')),
-                    const SizedBox(width: 10),
-                    Chip(label: Text('Bike Allocated')),
-                    const SizedBox(width: 10),
-                    Chip(label: Text('Return Requests')),
-                    const SizedBox(width: 10),
-                    Chip(label: Text('Damaged')),
-                  ],
+              SizedBox(
+                height: 120,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: filters.length,
+                  itemBuilder: (context, index) {
+                    final filter = filters[index];
+                    return GestureDetector(
+                      onTap: () {
+                        _selectedFilter = filter;
+                        _onFilterSelection(_selectedFilter);
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Chip(
+                                        
+                          backgroundColor: (_selectedFilter == filter)
+                              ? const Color.fromARGB(255, 240, 172, 237)
+                              : Colors.white,
+                        
+                          label: Text(filter),
+                        ),
+                      ),
+                      
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 10),
