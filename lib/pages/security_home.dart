@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wheelways/models/user_provider.dart';
 import 'package:wheelways/widgets/paginated_list_screen_available_bikes.dart';
 
-class SecurityHome extends StatefulWidget {
+class SecurityHome extends ConsumerStatefulWidget {
   const SecurityHome({super.key});
 
   @override
-  State<SecurityHome> createState() => _SecurityHomeState();
+  ConsumerState<SecurityHome> createState() => _SecurityHomeState();
 }
 
-class _SecurityHomeState extends State<SecurityHome> {
+class _SecurityHomeState extends ConsumerState<SecurityHome> {
   final List<String> filters = [
     'Available Bikes',
     'Bike Allocated',
@@ -18,37 +19,16 @@ class _SecurityHomeState extends State<SecurityHome> {
     'Damaged',
   ];
   late String _selectedFilter;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
   final _idController = TextEditingController();
   final _bikeLocation = TextEditingController();
   List<String> selectedColor = ['Red', 'Blue', 'Black', 'Green'];
   String? choosenColor;
-  String? userName;
-
-  Future<void> getCurrentUserId() async {
-    try {
-      if (_auth.currentUser != null) {
-        String uid = _auth.currentUser!.uid;
-        DocumentReference docRef = db.collection('users').doc(uid);
-        DocumentSnapshot snapshot = await docRef.get();
-        if (snapshot.exists) {
-          Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-          setState(() => userName = data['employeeName']);
-
-          print(userName);
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    getCurrentUserId();
     _selectedFilter = filters[0];
   }
 
@@ -76,6 +56,7 @@ class _SecurityHomeState extends State<SecurityHome> {
           'allocatedTo': '',
           'returnBy': '',
           'createdAt': FieldValue.serverTimestamp(),
+          'returnedAt': ''
         });
         if (!mounted) return;
         ScaffoldMessenger.of(
@@ -103,6 +84,8 @@ class _SecurityHomeState extends State<SecurityHome> {
 
   @override
   Widget build(BuildContext context) {
+    final userProviderValue = ref.watch(userProvider);
+    final userName = userProviderValue?.name ?? '';
     return Scaffold(
       appBar: AppBar(title: Text('Wheel Ways'), centerTitle: true),
       body: SingleChildScrollView(
@@ -112,9 +95,8 @@ class _SecurityHomeState extends State<SecurityHome> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              (userName != null)
-                  ? Text('Hello $userName! Welcome.')
-                  : Text('Hello User! Welcome.'),
+              Text('Hello $userName! Welcome.'),
+
               const SizedBox(height: 20),
               Container(
                 padding: EdgeInsets.all(12.0),
@@ -225,15 +207,13 @@ class _SecurityHomeState extends State<SecurityHome> {
                       child: Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Chip(
-                                        
                           backgroundColor: (_selectedFilter == filter)
                               ? const Color.fromARGB(255, 240, 172, 237)
                               : Colors.white,
-                        
+
                           label: Text(filter),
                         ),
                       ),
-                      
                     );
                   },
                 ),

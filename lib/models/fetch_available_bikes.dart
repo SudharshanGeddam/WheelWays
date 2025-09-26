@@ -14,6 +14,7 @@ class Fetchavailablebikes {
           .orderBy('createdAt', descending: true)
           .where('isAllocated', isEqualTo: false)
           .where('isDamaged', isEqualTo: false)
+          .where('isReturned', isEqualTo: false)
           .limit(_limit);
 
       if (lastDoc != null) {

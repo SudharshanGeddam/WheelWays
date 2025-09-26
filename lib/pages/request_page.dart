@@ -80,7 +80,9 @@ class _RequestPageState extends State<RequestPage> {
                                           .collection('BikesData')
                                           .doc(widget.bikeId)
                                           .update({
+                                            'returnedAt': FieldValue.serverTimestamp(),
                                             'isAllocated': false,
+                                            'isReturned':true,
                                             'returnBy': {widget.allocatedTo},
                                           });
 

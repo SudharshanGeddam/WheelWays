@@ -32,6 +32,7 @@ buildscript {
         }
     }
     dependencies {
+        classpath("com.android.tools.build:gradle:8.13.0") 
         classpath("gradle.plugin.com.google.cloud.artifactregistry:artifactregistry-gradle-plugin:2.2.1")
     }
 }

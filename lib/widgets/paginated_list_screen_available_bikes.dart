@@ -1,23 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:wheelways/models/fetch_available_bikes.dart';
+import 'package:wheelways/models/user_provider.dart';
 import 'package:wheelways/pages/request_page.dart';
 
-class PaginatedListScreenAvailableBikes extends StatefulWidget {
+class PaginatedListScreenAvailableBikes extends ConsumerStatefulWidget {
   const PaginatedListScreenAvailableBikes({super.key});
 
   @override
-  State<PaginatedListScreenAvailableBikes> createState() => _PaginatedListScreenState();
+  ConsumerState<PaginatedListScreenAvailableBikes> createState() =>
+      _PaginatedListScreenState();
 }
 
-class _PaginatedListScreenState extends State<PaginatedListScreenAvailableBikes> {
+class _PaginatedListScreenState
+    extends ConsumerState<PaginatedListScreenAvailableBikes> {
   late final Fetchavailablebikes fetchavailablebikes;
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final ScrollController _scrollController = ScrollController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  String? userName;
 
   bool isLoading = false;
 
@@ -26,7 +27,6 @@ class _PaginatedListScreenState extends State<PaginatedListScreenAvailableBikes>
     super.initState();
     fetchavailablebikes = Fetchavailablebikes();
     _loadMoreBikes();
-    _getCurrentUserId();
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -49,27 +49,10 @@ class _PaginatedListScreenState extends State<PaginatedListScreenAvailableBikes>
     });
   }
 
-  Future<void> _getCurrentUserId() async {
-    try {
-      if (_auth.currentUser != null) {
-        String uid = _auth.currentUser!.uid;
-        DocumentReference docRef = db.collection('users').doc(uid);
-        DocumentSnapshot snapshot = await docRef.get();
-        if (snapshot.exists) {
-          Map<String, dynamic> userData =
-              snapshot.data() as Map<String, dynamic>;
-          setState(() => userName = userData['employeeName']);
-
-          print(userName);
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final userProviderValue = ref.watch(userProvider);
+    final userName = userProviderValue?.name ?? '';
     return ListView.builder(
       controller: _scrollController,
       itemCount: fetchavailablebikes.bikes.length + 1,
@@ -121,7 +104,7 @@ class _PaginatedListScreenState extends State<PaginatedListScreenAvailableBikes>
                                 bikeId: data['bikeId'],
                                 bikeColor: data['bikeColor'],
                                 bikeLocation: data['bikeLocation'],
-                                allocatedTo: userName!,
+                                allocatedTo: userName,
                               ),
                             ),
                           );

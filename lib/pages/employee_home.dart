@@ -1,47 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
+import 'package:wheelways/models/user_provider.dart';
 import 'package:wheelways/widgets/paginated_list_screen_available_bikes.dart';
 
-class EmployeeHome extends StatefulWidget {
+class EmployeeHome extends ConsumerStatefulWidget {
   const EmployeeHome({super.key});
 
   @override
-  State<EmployeeHome> createState() => _EmployeeHomeState();
+  ConsumerState<EmployeeHome> createState() => _EmployeeHomeState();
 }
 
-class _EmployeeHomeState extends State<EmployeeHome> {
+class _EmployeeHomeState extends ConsumerState<EmployeeHome> {
   FirebaseFirestore db = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  String? userName;
-  Future<void> getCurrentUserId() async {
-    try {
-      if (_auth.currentUser != null) {
-        String uid = _auth.currentUser!.uid;
-        DocumentReference docRef = db.collection('users').doc(uid);
-        DocumentSnapshot snapshot = await docRef.get();
-        if (snapshot.exists) {
-          Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-
-          setState(() => userName = data['employeeName']);
-          print(userName);
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getCurrentUserId();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final userProviderValue = ref.watch(userProvider);
+    final userName = userProviderValue?.name ?? '';
     return Scaffold(
       appBar: AppBar(title: Text('Wheel Ways'), centerTitle: true),
       body: Padding(
@@ -49,9 +26,7 @@ class _EmployeeHomeState extends State<EmployeeHome> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            (userName != null)
-                ? Text('Hello $userName! Welcome.')
-                : Text('Hello User! Welcome.'),
+            Text('Hello $userName! Welcome.'),
             const SizedBox(height: 10),
             Center(
               child: Container(

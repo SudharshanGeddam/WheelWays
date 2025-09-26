@@ -1,21 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/src/core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:wheelways/Screens/register_screen.dart';
+import 'package:wheelways/models/get_users_details.dart';
 import 'package:wheelways/pages/admin_home.dart';
 import 'package:wheelways/pages/employee_home.dart';
 import 'package:wheelways/pages/security_home.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<StatefulWidget> createState() => LoginState();
+  ConsumerState<ConsumerStatefulWidget> createState() => LoginState();
 }
 
-class LoginState extends State<LoginScreen> {
+class LoginState extends ConsumerState<LoginScreen> {
+  final userDataGetter = GetUsersDetails();
   FirebaseFirestore db = FirebaseFirestore.instance;
   bool isLoading = false;
   bool isLoginState = false;
@@ -43,6 +46,7 @@ class LoginState extends State<LoginScreen> {
       if (isLoginState) {
         getUserRole(uid);
       }
+      await userDataGetter.getUserDetails(ref);
     } on FirebaseAuthException catch (e) {
       setState(() => isLoading = false);
       if (!mounted) return;
