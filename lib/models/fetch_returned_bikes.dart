@@ -8,25 +8,23 @@ class FetchReturnedBikes {
   bool hasMore = true;
 
   Future<void> fetchReturnBikes() async {
-    try{
-      Query query = db.collection('BikesData').orderBy('returnedAt', descending: true)
-      .where('isReturned', isEqualTo: true)
-      .limit(_limit);
+    try {
+      Query query = db
+          .collection('BikesData')
+          .where('isReturned', isEqualTo: true)
+          .where('isDamaged', isEqualTo: false)
+          .limit(_limit);
 
-      if(lastDoc != null) {
+      if (lastDoc != null) {
         query = query.startAfterDocument(lastDoc!);
       }
 
       QuerySnapshot querySnapshot = await query.get();
 
-      if(querySnapshot.docs.isEmpty) {
+      if (querySnapshot.docs.isNotEmpty) {
         lastDoc = querySnapshot.docs.last;
-
         bikes.addAll(querySnapshot.docs);
-
-        if(querySnapshot.docs.length < _limit) {
-          hasMore = false;
-        }
+        if (querySnapshot.docs.length < _limit) hasMore = false;
       } else {
         hasMore = false;
       }
@@ -34,5 +32,4 @@ class FetchReturnedBikes {
       print(e);
     }
   }
-
 }

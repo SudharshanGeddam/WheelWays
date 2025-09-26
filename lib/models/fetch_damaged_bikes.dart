@@ -9,7 +9,7 @@ class FetchDamagedBikes {
 
   Future<void> fetchDamagedBikes() async {
     try{
-      Query query = db.collection('BikesData').orderBy('returnedAt', descending: false)
+      Query query = db.collection('BikesData')
       .where('isDamaged', isEqualTo: true)
       .limit(_limit);
 
