@@ -65,13 +65,13 @@ class _SecurityHomeState extends ConsumerState<SecurityHome> {
           'createdAt': FieldValue.serverTimestamp(),
 
         });
-
+        if(!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Bike added Successfully')),
         );
       }
     } catch (e) {
-      print(e);
+      debugPrint('Error in adding new bikes.');
     }
   }
 
@@ -156,7 +156,6 @@ class _SecurityHomeState extends ConsumerState<SecurityHome> {
                         prefixIcon: Icon(Icons.color_lens_outlined),
                         border: OutlineInputBorder(),
                       ),
-                      value: choosenColor,
                       items: selectedColor
                           .map((val) => DropdownMenuItem(
                                 value: val,

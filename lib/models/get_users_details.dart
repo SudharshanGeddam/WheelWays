@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wheelways/models/user_provider.dart';
 
@@ -24,7 +25,7 @@ class GetUsersDetails {
         }
       }
     } catch (e) {
-      print(e);
+      debugPrint('Error in fetching UserDetails.');
     }
   }
 }

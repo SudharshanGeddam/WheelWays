@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class FetchReturnedBikes {
   FirebaseFirestore db = FirebaseFirestore.instance;
@@ -29,7 +30,7 @@ class FetchReturnedBikes {
         hasMore = false;
       }
     } catch (e) {
-      print(e);
+      debugPrint('Error in fetching Returned bikes.');
     }
   }
 }

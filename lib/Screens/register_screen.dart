@@ -86,7 +86,7 @@ class RegisterState extends State<RegisterScreen> {
         'createdAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      print(e);
+      debugPrint('Error in registering user.');
     }
   }
 

@@ -99,7 +99,7 @@ class _PaginatedListScreenState
                                   'returnedBy': userName,
                                 });
                           } catch (e) {
-                            print('Update failed');
+                            debugPrint('Error in updating verifed returned bikes.');
                           }
                         },
                         child: Text('Return'),
@@ -116,7 +116,7 @@ class _PaginatedListScreenState
                                   'returnedBy': userName,
                                 });
                           } catch (e) {
-                            print('Update failed');
+                            debugPrint('Error in updating verified Damaged bikes.');
                           }
                         },
                         child: Text('Damage'),

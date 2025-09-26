@@ -61,6 +61,7 @@ class LoginState extends ConsumerState<LoginScreen> {
       ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
       setState(() => isLoading = false);
+      if(!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Something went wrong')));
@@ -96,7 +97,7 @@ class LoginState extends ConsumerState<LoginScreen> {
         }
       }
     } catch (e) {
-      print(e);
+      debugPrint('Error in parsing user role.');
     }
   }
 

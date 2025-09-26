@@ -96,7 +96,7 @@ class _PaginatedListScreenState
                                 'isAllocated': true,
                                 'allocatedTo': userName,
                               });
-
+                          
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -109,7 +109,7 @@ class _PaginatedListScreenState
                             ),
                           );
                         } catch (e) {
-                          print('Update failed');
+                          debugPrint('Error in updating allocated bikes.');
                         }
                       },
                       child: Text('Request'),

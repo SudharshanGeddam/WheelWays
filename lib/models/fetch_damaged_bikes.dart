@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class FetchDamagedBikes {
   FirebaseFirestore db = FirebaseFirestore.instance;
@@ -32,7 +33,7 @@ class FetchDamagedBikes {
 
     } catch(e)
     {
-      print(e);
+     debugPrint('Error in fetching Damaged bikes.');
     }
   }
 }

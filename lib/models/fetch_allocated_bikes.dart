@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class FetchAllocatedBikes {
   final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -32,7 +33,7 @@ class FetchAllocatedBikes {
         hasMore = false;
       }
     } catch (e) {
-      print(e);
+     debugPrint('Error in fetching Allocated Bikes.');
     }
   }
 }

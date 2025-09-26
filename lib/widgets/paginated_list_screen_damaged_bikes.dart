@@ -100,7 +100,7 @@ class _PaginatedListScreenState
                                 'isReturned': false,
                               });
                         } catch (e) {
-                          print('Update failed');
+                          debugPrint('Error in updating Damaged bikes.');
                         }
                       },
                       child: Text('Repaired'),

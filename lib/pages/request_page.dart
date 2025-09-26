@@ -85,7 +85,7 @@ class _RequestPageState extends State<RequestPage> {
                                             'isReturned':true,
                                             'returnBy': {widget.allocatedTo},
                                           });
-
+                                          
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
@@ -93,10 +93,10 @@ class _RequestPageState extends State<RequestPage> {
                                           content: Text('Return Successful'),
                                         ),
                                       );
-
+                                      
                                       Navigator.pop(context);
                                     } catch (e) {
-                                      print(e);
+                                      debugPrint('Error in updating returned bikes.');
                                     } finally {
                                       if (mounted) {
                                         setState(() => _isLoading = false);
