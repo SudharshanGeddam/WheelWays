@@ -8,12 +8,7 @@ class BikesDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Bike Dashboard"),
-        backgroundColor: Colors.blue,
-      ),
-      body: StreamBuilder<Map<String, int>>(
+    return StreamBuilder<Map<String, int>>(
         stream: _service.bikeStatusStream(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -79,7 +74,6 @@ class BikesDashboard extends StatelessWidget {
             ),
           );
         },
-      ),
     );
   }
 
