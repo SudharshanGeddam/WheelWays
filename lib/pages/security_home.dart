@@ -41,7 +41,10 @@ class _SecurityHomeState extends ConsumerState<SecurityHome> {
   }
 
   Future<void> storeBikeDetails(
-      String bikeId, String bikeColor, String location) async {
+    String bikeId,
+    String bikeColor,
+    String location,
+  ) async {
     try {
       final DocumentReference bikeRef = db.collection('BikesData').doc(bikeId);
       final DocumentSnapshot bikeSnapshot = await bikeRef.get();
@@ -80,8 +83,7 @@ class _SecurityHomeState extends ConsumerState<SecurityHome> {
       _selectedFilter = selectedFilter;
       switch (selectedFilter) {
         case 'Available Bikes':
-          _currentScreen =
-              const PaginatedListScreenAvailableBikesSecurity();
+          _currentScreen = const PaginatedListScreenAvailableBikesSecurity();
           break;
         case 'Bike Allocated':
           _currentScreen = const PaginatedListScreenAllocatedBikes();
@@ -93,8 +95,9 @@ class _SecurityHomeState extends ConsumerState<SecurityHome> {
           _currentScreen = const PaginatedListScreenDamagedBikes();
           break;
         default:
-          _currentScreen =
-              const Center(child: Text('Select a filter to view bikes'));
+          _currentScreen = const Center(
+            child: Text('Select a filter to view bikes'),
+          );
       }
     });
   }
@@ -111,179 +114,182 @@ class _SecurityHomeState extends ConsumerState<SecurityHome> {
     final userAsync = ref.watch(userProvider);
 
     return userAsync.when(
-        data: (user) {
-          if (user == null) {
-            return const Center(child: Text("No user signed in"));
-          }
+      data: (user) {
+        if (user == null) {
+          return const Center(child: Text("No user signed in"));
+        }
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-            
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text('Hello ${user.name}! Welcome.'),
-              ),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text('Hello ${user.name}! Welcome.'),
+            ),
 
-            
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Container(
-                  padding: const EdgeInsets.all(12.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.0),
-                    color: const Color.fromARGB(255, 188, 222, 250),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color.fromARGB(255, 238, 233, 233),
-                        offset: Offset(4, 4),
-                        blurRadius: 10,
-                        spreadRadius: 2,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.0),
+                  color: const Color.fromARGB(255, 188, 222, 250),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color.fromARGB(255, 238, 233, 233),
+                      offset: Offset(4, 4),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _idController,
+                      
+                        decoration: const InputDecoration(
+                          labelText: 'Bike Id',
+                          fillColor: Color.fromARGB(255, 235, 233, 233),
+                          prefixIcon: Icon(Icons.add_circle_outline),
+                          
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) =>
+                            value!.isEmpty ? 'Id required' : null,
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(
+                          labelText: 'Choose color',
+                          fillColor: Color.fromARGB(255, 235, 233, 233),
+                          prefixIcon: Icon(Icons.color_lens_outlined),
+                          border: OutlineInputBorder(),
+                        ),
+                        items: selectedColor
+                            .map(
+                              (val) => DropdownMenuItem(
+                                value: val,
+                                child: Text(val),
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (value) => setState(() {
+                          choosenColor = value;
+                        }),
+                        validator: (value) =>
+                            value == null ? 'Please choose a color' : null,
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        controller: _bikeLocation,
+                        decoration: const InputDecoration(
+                          labelText: 'Bike Location',
+                          fillColor: Color.fromARGB(255, 235, 233, 233),
+                          prefixIcon: Icon(Icons.location_on_outlined),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) =>
+                            value!.isEmpty ? 'Mention Location' : null,
+                      ),
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              storeBikeDetails(
+                                _idController.text.trim(),
+                                choosenColor!,
+                                _bikeLocation.text.trim(),
+                              );
+                              setState(() {
+                                choosenColor = null;
+                                _idController.clear();
+                                _bikeLocation.clear();
+                              });
+                            }
+                          },
+                          child: const Text('Add Bike'),
+                        ),
                       ),
                     ],
                   ),
-                  child: Form(
-                    key: _formKey,
+                ),
+              ),
+            ),
+
+            Expanded(
+              child: DraggableScrollableSheet(
+                initialChildSize: 0.9,
+                minChildSize: 0.5,
+                maxChildSize: 0.95,
+                builder: (context, controller) {
+                  return Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                      boxShadow: [
+                        BoxShadow(blurRadius: 8, color: Colors.black26),
+                      ],
+                    ),
                     child: Column(
                       children: [
-                        TextFormField(
-                          controller: _idController,
-                          decoration: const InputDecoration(
-                            labelText: 'Bike Id',
-                            prefixIcon: Icon(Icons.add_circle_outline),
-                            border: OutlineInputBorder(),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[400],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          validator: (value) =>
-                              value!.isEmpty ? 'Id required' : null,
                         ),
-                        const SizedBox(height: 10),
-                        DropdownButtonFormField<String>(
-                          decoration: const InputDecoration(
-                            labelText: 'Choose color',
-                            prefixIcon: Icon(Icons.color_lens_outlined),
-                            border: OutlineInputBorder(),
-                          ),
-                          items: selectedColor
-                              .map((val) => DropdownMenuItem(
-                                    value: val,
-                                    child: Text(val),
-                                  ))
-                              .toList(),
-                          onChanged: (value) => setState(() {
-                            choosenColor = value;
-                          }),
-                          validator: (value) =>
-                              value == null ? 'Please choose a color' : null,
-                        ),
-                        const SizedBox(height: 10),
-                        TextFormField(
-                          controller: _bikeLocation,
-                          decoration: const InputDecoration(
-                            labelText: 'Bike Location',
-                            prefixIcon: Icon(Icons.location_on_outlined),
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) =>
-                              value!.isEmpty ? 'Mention Location' : null,
-                        ),
-                        const SizedBox(height: 10),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                storeBikeDetails(
-                                  _idController.text.trim(),
-                                  choosenColor!,
-                                  _bikeLocation.text.trim(),
-                                );
-                                setState(() {
-                                  choosenColor = null;
-                                  _idController.clear();
-                                  _bikeLocation.clear();
-                                });
-                              }
+
+                        SizedBox(
+                          height: 60,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: filters.length,
+                            itemBuilder: (context, index) {
+                              final filter = filters[index];
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ChoiceChip(
+                                  label: Text(filter),
+                                  selected: _selectedFilter == filter,
+                                  onSelected: (_) => _onFilterSelection(filter),
+                                ),
+                              );
                             },
-                            child: const Text('Add Bike'),
                           ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Expanded(
+                          child:
+                              _currentScreen ??
+                              const Center(
+                                child: Text('Select a filter to view bikes'),
+                              ),
                         ),
                       ],
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
-
-              
-              Expanded(
-                child: DraggableScrollableSheet(
-                  initialChildSize: 0.9,
-                  minChildSize: 0.5,
-                  maxChildSize: 0.95,
-                  builder: (context, controller) {
-                    return Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(16)),
-                        boxShadow: [
-                          BoxShadow(blurRadius: 8, color: Colors.black26)
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // drag handle
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Container(
-                              width: 40,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[400],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          ),
-
-                          // Filter chips
-                          SizedBox(
-                            height: 60,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: filters.length,
-                              itemBuilder: (context, index) {
-                                final filter = filters[index];
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: ChoiceChip(
-                                    label: Text(filter),
-                                    selected: _selectedFilter == filter,
-                                    onSelected: (_) =>
-                                        _onFilterSelection(filter),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          // Bike list
-                          Expanded(
-                            child: _currentScreen ??
-                                const Center(
-                                    child: Text('Select a filter to view bikes')),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+            ),
+          ],
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(child: Text('Error: $err')),
     );
   }
 }

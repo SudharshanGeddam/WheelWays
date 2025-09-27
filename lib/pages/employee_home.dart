@@ -31,7 +31,10 @@ class _EmployeeHomeState extends ConsumerState<EmployeeHome> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Hello ${user.name}! Welcome.'),
+                Text(
+                  'Hello ${user.name}! Welcome.',
+                  style: TextTheme.of(context).titleMedium,
+                ),
                 const SizedBox(height: 10),
                 Center(
                   child: Container(
@@ -70,7 +73,6 @@ class _EmployeeHomeState extends ConsumerState<EmployeeHome> {
                         ),
                         child: Column(
                           children: [
-                            // small drag handle
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                 vertical: 8.0,
@@ -84,7 +86,7 @@ class _EmployeeHomeState extends ConsumerState<EmployeeHome> {
                                 ),
                               ),
                             ),
-                            // Expanded list that uses the provided scrollController
+
                             Expanded(
                               child: PaginatedListScreenAvailableBikes(
                                 controller: scrollController,

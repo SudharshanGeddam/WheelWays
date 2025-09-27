@@ -50,101 +50,115 @@ class _PaginatedListScreenState
 
   @override
   Widget build(BuildContext context) {
-    return UserAsyncWrapper(builder: (context, user){
-      final userName = user.name ?? '';
-  
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: fetchReturnedBikes.bikes.length + 1,
-      itemBuilder: (context, index) {
-        if (index < fetchReturnedBikes.bikes.length) {
-          var data =
-              fetchReturnedBikes.bikes[index].data() as Map<String, dynamic>;
-          return Card(
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+    return UserAsyncWrapper(
+      builder: (context, user) {
+        final userName = user.name ?? '';
+
+        return ListView.builder(
+          controller: _scrollController,
+          itemCount: fetchReturnedBikes.bikes.length + 1,
+          itemBuilder: (context, index) {
+            if (index < fetchReturnedBikes.bikes.length) {
+              var data =
+                  fetchReturnedBikes.bikes[index].data()
+                      as Map<String, dynamic>;
+              return Card(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        'assets/images/bike_img.jpg',
-                        height: 40,
-                        fit: BoxFit.cover,
+                      Row(
+                        children: [
+                          Image.asset(
+                            'assets/images/bike_img.jpg',
+                            height: 40,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(width: 10),
+                          const Text('HCL Bikes'),
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      const Text('HCL Bikes'),
+                      Text('ReturnedBy: $userName'),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Color: ${data['bikeColor']}',
+                        style: TextTheme.of(context).bodySmall,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Bike Id: ${data['bikeId']}',
+                        style: TextTheme.of(context).bodySmall,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Location: ${data['bikeLocation']}',
+                        style: TextTheme.of(context).bodySmall,
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                await db
+                                    .collection('BikesData')
+                                    .doc(fetchReturnedBikes.bikes[index].id)
+                                    .update({
+                                      'isRetured': true,
+                                      'returnedBy': userName,
+                                    });
+                              } catch (e) {
+                                debugPrint(
+                                  'Error in updating verifed returned bikes.',
+                                );
+                              }
+                            },
+                            child: Text('Return'),
+                          ),
+                          const SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                await db
+                                    .collection('BikesData')
+                                    .doc(fetchReturnedBikes.bikes[index].id)
+                                    .update({
+                                      'isDamaged': true,
+                                      'returnedBy': userName,
+                                    });
+                              } catch (e) {
+                                debugPrint(
+                                  'Error in updating verified Damaged bikes.',
+                                );
+                              }
+                            },
+                            child: Text('Damage'),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                  Text('ReturnedBy: $userName'),
-                  const SizedBox(height: 5),
-                  Text('Color: ${data['bikeColor']}'),
-                  const SizedBox(height: 5),
-                  Text('Bike Id: ${data['bikeId']}'),
-                  const SizedBox(height: 5),
-                  Text('Location: ${data['bikeLocation']}'),
-                  const SizedBox(height: 5),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            await db
-                                .collection('BikesData')
-                                .doc(fetchReturnedBikes.bikes[index].id)
-                                .update({
-                                  'isRetured': true,
-                                  'returnedBy': userName,
-                                });
-                          } catch (e) {
-                            debugPrint('Error in updating verifed returned bikes.');
-                          }
-                        },
-                        child: Text('Return'),
+                ),
+              );
+            } else {
+              return isLoading
+                  ? Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Lottie.asset(
+                          'assets/lotties/Loading.json',
+                          width: 100,
+                          height: 100,
+                        ),
                       ),
-                      const SizedBox(width: 10,),
-                      ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            await db
-                                .collection('BikesData')
-                                .doc(fetchReturnedBikes.bikes[index].id)
-                                .update({
-                                  'isDamaged': true,
-                                  'returnedBy': userName,
-                                });
-                          } catch (e) {
-                            debugPrint('Error in updating verified Damaged bikes.');
-                          }
-                        },
-                        child: Text('Damage'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else {
-          return isLoading
-              ? Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(
-                    child: Lottie.asset(
-                      'assets/lotties/Loading.json',
-                      width: 100,
-                      height: 100,
-                    ),
-                  ),
-                )
-              : SizedBox();
-        }
+                    )
+                  : SizedBox();
+            }
+          },
+        );
       },
-      
-    );
-    }
     );
   }
 }

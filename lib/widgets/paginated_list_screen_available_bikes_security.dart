@@ -51,91 +51,102 @@ class _PaginatedListScreenState
 
   @override
   Widget build(BuildContext context) {
-    return UserAsyncWrapper(builder: (context, user){
-      final userName = user.name ?? '';
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: fetchavailablebikes.bikes.length + 1,
-      itemBuilder: (context, index) {
-        if (index < fetchavailablebikes.bikes.length) {
-          var data =
-              fetchavailablebikes.bikes[index].data() as Map<String, dynamic>;
-          return Card(
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+    return UserAsyncWrapper(
+      builder: (context, user) {
+        final userName = user.name ?? '';
+        return ListView.builder(
+          controller: _scrollController,
+          itemCount: fetchavailablebikes.bikes.length + 1,
+          itemBuilder: (context, index) {
+            if (index < fetchavailablebikes.bikes.length) {
+              var data =
+                  fetchavailablebikes.bikes[index].data()
+                      as Map<String, dynamic>;
+              return Card(
+                child: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        'assets/images/bike_img.jpg',
-                        height: 40,
-                        fit: BoxFit.cover,
+                      Row(
+                        children: [
+                          Image.asset(
+                            'assets/images/bike_img.jpg',
+                            height: 40,
+                            fit: BoxFit.cover,
+                          ),
+                          const SizedBox(width: 10),
+                          const Text('HCL Bikes'),
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      const Text('HCL Bikes'),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Color: ${data['bikeColor']}',
+                        style: TextTheme.of(context).bodySmall,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Bike Id: ${data['bikeId']}',
+                        style: TextTheme.of(context).bodySmall,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Location: ${data['bikeLocation']}',
+                        style: TextTheme.of(context).bodySmall,
+                      ),
+                      const SizedBox(height: 5),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            try {
+                              await db
+                                  .collection('BikesData')
+                                  .doc(fetchavailablebikes.bikes[index].id)
+                                  .update({
+                                    'isAllocated': true,
+                                    'allocatedTo': userName,
+                                  });
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RequestPage(
+                                    bikeId: data['bikeId'],
+                                    bikeColor: data['bikeColor'],
+                                    bikeLocation: data['bikeLocation'],
+                                    allocatedTo: userName,
+                                  ),
+                                ),
+                              );
+                            } catch (e) {
+                              debugPrint('Error in updating allocated bikes.');
+                            }
+                          },
+                          child: Text('Request'),
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 5),
-                  Text('Color: ${data['bikeColor']}'),
-                  const SizedBox(height: 5),
-                  Text('Bike Id: ${data['bikeId']}'),
-                  const SizedBox(height: 5),
-                  Text('Location: ${data['bikeLocation']}'),
-                  const SizedBox(height: 5),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          await db
-                              .collection('BikesData')
-                              .doc(fetchavailablebikes.bikes[index].id)
-                              .update({
-                                'isAllocated': true,
-                                'allocatedTo': userName,
-                              });
-                          
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RequestPage(
-                                bikeId: data['bikeId'],
-                                bikeColor: data['bikeColor'],
-                                bikeLocation: data['bikeLocation'],
-                                allocatedTo: userName,
-                              ),
-                            ),
-                          );
-                        } catch (e) {
-                          debugPrint('Error in updating allocated bikes.');
-                        }
-                      },
-                      child: Text('Request'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else {
-          return isLoading
-              ? Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(
-                    child: Lottie.asset(
-                      'assets/lotties/Loading.json',
-                      width: 100,
-                      height: 100,
-                    ),
-                  ),
-                )
-              : SizedBox();
-        }
+                ),
+              );
+            } else {
+              return isLoading
+                  ? Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Lottie.asset(
+                          'assets/lotties/Loading.json',
+                          width: 100,
+                          height: 100,
+                        ),
+                      ),
+                    )
+                  : SizedBox();
+            }
+          },
+        );
       },
-    );
-    }
     );
   }
 }

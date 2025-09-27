@@ -66,8 +66,7 @@ class RegisterState extends State<RegisterScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Something went wrong')));
-    }
-    finally {
+    } finally {
       setState(() => isLoading = false);
     }
   }
@@ -145,6 +144,7 @@ class RegisterState extends State<RegisterScreen> {
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
                           label: Text('Employee Name'),
+                          fillColor: Colors.white,
                           prefixIcon: Icon(Icons.person_2_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -160,6 +160,7 @@ class RegisterState extends State<RegisterScreen> {
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
                           label: Text('Role'),
+                          fillColor: Colors.white,
                           prefixIcon: Icon(Icons.admin_panel_settings_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -175,6 +176,7 @@ class RegisterState extends State<RegisterScreen> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           label: Text('Email'),
+                          fillColor: Colors.white,
                           prefixIcon: Icon(Icons.email_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -190,6 +192,7 @@ class RegisterState extends State<RegisterScreen> {
                         obscureText: true,
                         decoration: InputDecoration(
                           label: Text('Password'),
+                          fillColor: Colors.white,
                           prefixIcon: Icon(Icons.password_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -205,6 +208,7 @@ class RegisterState extends State<RegisterScreen> {
                         obscureText: true,
                         decoration: InputDecoration(
                           label: Text('Confirm Password'),
+                          fillColor: Colors.white,
                           prefixIcon: Icon(Icons.password_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -240,7 +244,7 @@ class RegisterState extends State<RegisterScreen> {
                                   style: GoogleFonts.montserrat(
                                     fontStyle: FontStyle.normal,
                                     fontWeight: FontWeight.w500,
-                                    fontSize: 16.0
+                                    fontSize: 16.0,
                                   ),
                                 ),
                         ),

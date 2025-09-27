@@ -7,11 +7,8 @@ class AdminHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    appBar: AppBar(
-      title: Text('WheelWays'),
-      centerTitle: true,
-    ),
-    body: 
-    BikesDashboard());
+      appBar: AppBar(title: Text('WheelWays')),
+      body: BikesDashboard(),
+    );
   }
 }

@@ -5,8 +5,6 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wheelways/Screens/login_screen.dart';
 
-/// A simple ThemeMode provider. The app's root MaterialApp must listen to this
-/// provider for the theme changes to take effect across the app.
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
 
 class SettingsPage extends ConsumerStatefulWidget {
@@ -17,8 +15,6 @@ class SettingsPage extends ConsumerStatefulWidget {
 }
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
-  bool _isDark = false;
-
   @override
   void initState() {
     super.initState();
@@ -27,16 +23,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   Future<void> _loadSavedTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getBool('isDarkMode') ?? false;
-    setState(() => _isDark = saved);
-    ref.read(themeModeProvider.notifier).state = saved ? ThemeMode.dark : ThemeMode.light;
+    final saved = prefs.getBool('isDarkMode');
+    if (saved != null) {
+      ref.read(themeModeProvider.notifier).state = saved
+          ? ThemeMode.dark
+          : ThemeMode.light;
+    }
   }
 
   Future<void> _setTheme(bool dark) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isDarkMode', dark);
-    setState(() => _isDark = dark);
-    ref.read(themeModeProvider.notifier).state = dark ? ThemeMode.dark : ThemeMode.light;
+    ref.read(themeModeProvider.notifier).state = dark
+        ? ThemeMode.dark
+        : ThemeMode.light;
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Theme updated: ${dark ? "Dark" : "Light"}')),
@@ -46,7 +46,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   Future<void> _confirmSignOut() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No user signed in')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('No user signed in')));
       return;
     }
 
@@ -56,8 +58,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         title: const Text('Sign out'),
         content: const Text('Are you sure you want to sign out?'),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Sign out')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Sign out'),
+          ),
         ],
       ),
     );
@@ -73,7 +81,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to sign out')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to sign out')));
     }
   }
 
@@ -89,7 +99,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    return  ListView(
+    final themeMode = ref.watch(themeModeProvider);
+
+    return Scaffold(
+      
+      body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
           ListTile(
@@ -97,14 +111,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             title: Text(user?.email ?? 'Not signed in'),
             trailing: TextButton.icon(
               icon: const Icon(Icons.logout),
-              label: const Text('Logout'),
+              label: Text('Logout', style: TextTheme.of(context).titleMedium),
               onPressed: user == null ? null : _confirmSignOut,
             ),
           ),
           const Divider(),
           SwitchListTile(
-            value: _isDark,
-            title: const Text('Dark Mode'),
+            value: themeMode == ThemeMode.dark,
+            title: Text('Dark Mode', style: TextTheme.of(context).titleMedium),
             subtitle: const Text('Toggle app theme'),
             secondary: const Icon(Icons.brightness_6),
             onChanged: (v) => _setTheme(v),
@@ -112,14 +126,20 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           const Divider(),
           ListTile(
             leading: const Icon(Icons.info_outline),
-            title: const Text('Licenses & About'),
+            title: Text(
+              'Licenses & About',
+              style: TextTheme.of(context).titleMedium,
+            ),
             subtitle: const Text('View open source licenses and app info'),
             onTap: _showLicenses,
           ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.delete_forever),
-            title: const Text('Clear local preferences'),
+            title: Text(
+              'Clear local preferences',
+              style: TextTheme.of(context).titleMedium,
+            ),
             subtitle: const Text('Reset saved theme preference'),
             onTap: () async {
               final prefs = await SharedPreferences.getInstance();
@@ -128,7 +148,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
         ],
-
+      ),
     );
   }
 }

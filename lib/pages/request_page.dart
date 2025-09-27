@@ -59,11 +59,20 @@ class _RequestPageState extends State<RequestPage> {
                           ],
                         ),
                         const SizedBox(height: 5),
-                        Text('Color: ${widget.bikeColor}'),
+                        Text(
+                          'Color: ${widget.bikeColor}',
+                          style: TextTheme.of(context).bodySmall,
+                        ),
                         const SizedBox(height: 5),
-                        Text('Bike Id: ${widget.bikeId}'),
+                        Text(
+                          'Bike Id: ${widget.bikeId}',
+                          style: TextTheme.of(context).bodySmall,
+                        ),
                         const SizedBox(height: 5),
-                        Text('Location: ${widget.bikeLocation}'),
+                        Text(
+                          'Location: ${widget.bikeLocation}',
+                          style: TextTheme.of(context).bodySmall,
+                        ),
                         const SizedBox(height: 5),
                         Align(
                           alignment: Alignment.centerRight,
@@ -80,12 +89,13 @@ class _RequestPageState extends State<RequestPage> {
                                           .collection('BikesData')
                                           .doc(widget.bikeId)
                                           .update({
-                                            'returnedAt': FieldValue.serverTimestamp(),
+                                            'returnedAt':
+                                                FieldValue.serverTimestamp(),
                                             'isAllocated': false,
-                                            'isReturned':true,
+                                            'isReturned': true,
                                             'returnBy': {widget.allocatedTo},
                                           });
-                                          
+
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
@@ -93,10 +103,12 @@ class _RequestPageState extends State<RequestPage> {
                                           content: Text('Return Successful'),
                                         ),
                                       );
-                                      
+
                                       Navigator.pop(context);
                                     } catch (e) {
-                                      debugPrint('Error in updating returned bikes.');
+                                      debugPrint(
+                                        'Error in updating returned bikes.',
+                                      );
                                     } finally {
                                       if (mounted) {
                                         setState(() => _isLoading = false);
@@ -118,15 +130,15 @@ class _RequestPageState extends State<RequestPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20,),
+                const SizedBox(height: 20),
                 Container(
                   alignment: Alignment.bottomCenter,
                   color: Colors.amberAccent,
-                  child: Text('Note: Please return the current bicycle for making new requests.Navigation to previous screens are not allowed',
-                  style: TextStyle(color: Colors.red,
-                  fontSize: 20,),
-                  ), 
-                )
+                  child: Text(
+                    'Note: Please return the current bicycle for making new requests.Navigation to previous screens are not allowed',
+                    style: TextStyle(color: Colors.red, fontSize: 20),
+                  ),
+                ),
               ],
             ),
           ),

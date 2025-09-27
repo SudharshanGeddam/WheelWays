@@ -37,7 +37,10 @@ class LoginState extends ConsumerState<LoginScreen> {
       setState(() => isLoading = false);
       isLoginState = true;
       if (!mounted) return;
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> BottomNavigationBarWidget()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => BottomNavigationBarWidget()),
+      );
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Login Successful.')));
@@ -119,6 +122,7 @@ class LoginState extends ConsumerState<LoginScreen> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           label: Text("Email"),
+                          fillColor: Colors.white,
                           prefixIcon: Icon(Icons.email_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -134,6 +138,7 @@ class LoginState extends ConsumerState<LoginScreen> {
                         obscureText: true,
                         decoration: InputDecoration(
                           label: Text("Password"),
+                          fillColor: Colors.white,
                           prefixIcon: Icon(Icons.lock_outline),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
@@ -167,7 +172,7 @@ class LoginState extends ConsumerState<LoginScreen> {
                                   style: GoogleFonts.montserrat(
                                     fontStyle: FontStyle.normal,
                                     fontWeight: FontWeight.w500,
-                                    fontSize: 16.0
+                                    fontSize: 16.0,
                                   ),
                                 ),
                         ),

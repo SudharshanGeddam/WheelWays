@@ -23,7 +23,7 @@ class WelcomeScreen extends StatelessWidget {
           const SizedBox(height: 20),
           const Text(
             "WHEELWAYS",
-            style: TextStyle(letterSpacing: 35.0, fontSize: 18, ),
+            style: TextStyle(letterSpacing: 35.0, fontSize: 18, color: Colors.black),
             softWrap: false,
             overflow: TextOverflow.fade,
           ),

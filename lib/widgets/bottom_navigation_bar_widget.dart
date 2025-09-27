@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 import 'package:wheelways/models/user_service.dart';
 import 'package:wheelways/pages/admin_home.dart';
 import 'package:wheelways/pages/employee_home.dart';
@@ -50,8 +51,12 @@ class _BottomNavigationBarWidgetState
         ? Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                CircularProgressIndicator(),
+              children: [
+                SizedBox(
+                  width: 1000,
+                  height: 100,
+                  child: Lottie.asset('assets/lotties/Loading.json'),
+                ),
                 SizedBox(height: 12),
                 Text('Loading Home... 😊'),
               ],
