@@ -59,7 +59,7 @@ class _EmployeeHomeState extends ConsumerState<EmployeeHome> {
                   child: DraggableScrollableSheet(
                     initialChildSize: 0.9,
                     minChildSize: 0.5,
-                    maxChildSize: 0.9,
+                    maxChildSize: 0.95,
                     builder: (context, scrollController) {
                       return Container(
                         decoration: const BoxDecoration(
