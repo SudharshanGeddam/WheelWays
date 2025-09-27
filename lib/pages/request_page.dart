@@ -105,8 +105,8 @@ class _RequestPageState extends State<RequestPage> {
                                   },
                             child: _isLoading
                                 ? SizedBox(
-                                    height: 100,
-                                    width: 100,
+                                    height: 50,
+                                    width: 50,
                                     child: Lottie.asset(
                                       'assets/lotties/Loading.json',
                                     ),
@@ -118,6 +118,15 @@ class _RequestPageState extends State<RequestPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 20,),
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  color: Colors.amberAccent,
+                  child: Text('Note: Please return the current bicycle for making new requests.Navigation to previous screens are not allowed',
+                  style: TextStyle(color: Colors.red,
+                  fontSize: 20,),
+                  ), 
+                )
               ],
             ),
           ),

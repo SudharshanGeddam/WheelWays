@@ -6,16 +6,16 @@ import 'package:wheelways/models/fetch_available_bikes.dart';
 import 'package:wheelways/pages/request_page.dart';
 import 'package:wheelways/wrapper/user_wrapper.dart';
 
-class PaginatedListScreenAvailableBikes extends ConsumerStatefulWidget {
-  const PaginatedListScreenAvailableBikes({super.key, required ScrollController controller});
+class PaginatedListScreenAvailableBikesSecurity extends ConsumerStatefulWidget {
+  const PaginatedListScreenAvailableBikesSecurity({super.key});
 
   @override
-  ConsumerState<PaginatedListScreenAvailableBikes> createState() =>
+  ConsumerState<PaginatedListScreenAvailableBikesSecurity> createState() =>
       _PaginatedListScreenState();
 }
 
 class _PaginatedListScreenState
-    extends ConsumerState<PaginatedListScreenAvailableBikes> {
+    extends ConsumerState<PaginatedListScreenAvailableBikesSecurity> {
   late final Fetchavailablebikes fetchavailablebikes;
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final ScrollController _scrollController = ScrollController();
@@ -96,7 +96,7 @@ class _PaginatedListScreenState
                                 'isAllocated': true,
                                 'allocatedTo': userName,
                               });
-                        
+                          
                           Navigator.push(
                             context,
                             MaterialPageRoute(

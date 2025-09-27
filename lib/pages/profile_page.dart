@@ -12,8 +12,8 @@ class ProfilePage extends ConsumerStatefulWidget{
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-  late final TextEditingController phoneNoController;
-  late final TextEditingController employeeIdController;
+ final  phoneNoController = TextEditingController();
+ final  employeeIdController = TextEditingController();
 
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final FirebaseAuth _auth  = FirebaseAuth.instance;
@@ -24,10 +24,22 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       await db.collection('users').doc(uid).set({
         'phoneNo': phoneNo,
         'employeeId':employeeId,
-      });
+      },
+      SetOptions(merge: true)
+      );
+      if(!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Data Added Successfully.')));
     } catch(e){
       debugPrint('Failed to store details $e');
     }
+  }
+
+  @override
+  void dispose() 
+  {
+    super.dispose();
+    phoneNoController.dispose();
+    employeeIdController.dispose();
   }
 
   @override
@@ -36,16 +48,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       final userName = user.name ?? '';
       final userRole = user.role ?? '';
       final userEmail = user.email ?? '';
-    return Scaffold(
-      body: Padding(padding: EdgeInsets.all(16.0),
+    return  Padding(padding: EdgeInsets.all(16.0),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        
         children: [
           CircleAvatar(
-            radius: 50,
-            backgroundColor: Colors.purple,
+            radius: 80,
+            backgroundImage: AssetImage('assets/images/profile_picture.png'),
           ),
-          const SizedBox(height: 10,),
+          const SizedBox(height: 50,),
           TextField(
             controller: TextEditingController(text: userName),
             readOnly: true,
@@ -56,7 +67,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
           ),
-          const SizedBox(height: 10,),
+          const SizedBox(height: 20,),
           TextField(
             controller: TextEditingController(text: userEmail),
             readOnly: true,
@@ -67,7 +78,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
           ),
-          const SizedBox(height: 10,),
+          const SizedBox(height: 20,),
           TextField(
             controller: TextEditingController(text: userRole),
             readOnly: true,
@@ -78,6 +89,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
           ),
+          const SizedBox(height: 20,),
           TextField(
             controller: phoneNoController,
             decoration: InputDecoration(
@@ -87,9 +99,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
           ),  
+          const SizedBox(height: 20,),
           TextField(
             controller: employeeIdController,
-            readOnly: true,
             decoration: InputDecoration(
               labelText: 'Employee_Id',
               border: OutlineInputBorder(
@@ -97,14 +109,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
             ),
           ),   
+          const SizedBox(height: 20,),
           Align(
             alignment: Alignment.bottomRight,
-            child: ElevatedButton(
+            child: FilledButton(
               onPressed: () => saveUserDetails(phoneNoController.text.trim(), employeeIdController.text.trim()),
-              child: Text('Save'),),
+              child: Text('Update'),),
           )
         ],
-      ),),
+      ),
     );
     }
     );

@@ -50,8 +50,52 @@ class _EmployeeHomeState extends ConsumerState<EmployeeHome> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                const Expanded(child: PaginatedListScreenAvailableBikes()),
+                const SizedBox(height: 50),
+
+                Expanded(
+                  child: DraggableScrollableSheet(
+                    initialChildSize: 0.9,
+                    minChildSize: 0.5,
+                    maxChildSize: 0.9,
+                    builder: (context, scrollController) {
+                      return Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                          boxShadow: [
+                            BoxShadow(blurRadius: 8, color: Colors.black26),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            // small drag handle
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
+                              child: Container(
+                                width: 40,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                            // Expanded list that uses the provided scrollController
+                            Expanded(
+                              child: PaginatedListScreenAvailableBikes(
+                                controller: scrollController,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             );
           },

@@ -16,13 +16,13 @@ class RegisterState extends State<RegisterScreen> {
   bool isUserCreated = false;
 
   final _formKey = GlobalKey<FormState>();
-  final _idController = TextEditingController();
+  final _nameController = TextEditingController();
   final _roleController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  String get empId => _idController.text.trim();
+  String get empName => _nameController.text.trim();
   String get role => _roleController.text.trim();
   String get email => _emailController.text.trim();
 
@@ -46,7 +46,7 @@ class RegisterState extends State<RegisterScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text('Registeration Successful.')));
       if (isUserCreated) {
-        storeUserDetails(uid, empId, role, email);
+        storeUserDetails(uid, empName, role, email);
         Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {
@@ -74,13 +74,13 @@ class RegisterState extends State<RegisterScreen> {
 
   Future<void> storeUserDetails(
     String uid,
-    String empId,
+    String empName,
     String role,
     String email,
   ) async {
     try {
       await db.collection('users').doc(uid).set({
-        'employeeId': empId,
+        'employeeName': empName,
         'role': role,
         'email': email,
         'createdAt': FieldValue.serverTimestamp(),
@@ -92,7 +92,7 @@ class RegisterState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    _idController.dispose();
+    _nameController.dispose();
     _roleController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -140,7 +140,7 @@ class RegisterState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
-                        controller: _idController,
+                        controller: _nameController,
                         textCapitalization: TextCapitalization.none,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
