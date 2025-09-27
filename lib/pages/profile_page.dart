@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wheelways/wrapper/user_wrapper.dart';
@@ -10,6 +12,24 @@ class ProfilePage extends ConsumerStatefulWidget{
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
+  late final TextEditingController phoneNoController;
+  late final TextEditingController employeeIdController;
+
+  final FirebaseFirestore db = FirebaseFirestore.instance;
+  final FirebaseAuth _auth  = FirebaseAuth.instance;
+
+  Future<void> saveUserDetails(String phoneNo, String employeeId) async {
+    try{
+      String uid = _auth.currentUser!.uid;
+      await db.collection('users').doc(uid).set({
+        'phoneNo': phoneNo,
+        'employeeId':employeeId,
+      });
+    } catch(e){
+      debugPrint('Failed to store details $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return UserAsyncWrapper(builder: (context, user){
@@ -31,7 +51,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             readOnly: true,
             decoration: InputDecoration(
               labelText: 'Name',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
             ),
           ),
           const SizedBox(height: 10,),
@@ -40,7 +62,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             readOnly: true,
             decoration: InputDecoration(
               labelText: 'Email',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
             ),
           ),
           const SizedBox(height: 10,),
@@ -49,10 +73,36 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             readOnly: true,
             decoration: InputDecoration(
               labelText: 'Role',
-              border: OutlineInputBorder(),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
             ),
           ),
-          
+          TextField(
+            controller: phoneNoController,
+            decoration: InputDecoration(
+              labelText: 'Phone.No',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+          ),  
+          TextField(
+            controller: employeeIdController,
+            readOnly: true,
+            decoration: InputDecoration(
+              labelText: 'Employee_Id',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+          ),   
+          Align(
+            alignment: Alignment.bottomRight,
+            child: ElevatedButton(
+              onPressed: () => saveUserDetails(phoneNoController.text.trim(), employeeIdController.text.trim()),
+              child: Text('Save'),),
+          )
         ],
       ),),
     );
