@@ -126,7 +126,7 @@ class RegisterState extends State<RegisterScreen> {
                         'REGISTER',
                         style: GoogleFonts.montserrat(
                           fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                          fontSize: 22,
                           letterSpacing: 3.0,
                         ),
                       ),
@@ -144,14 +144,14 @@ class RegisterState extends State<RegisterScreen> {
                         textCapitalization: TextCapitalization.none,
                         keyboardType: TextInputType.text,
                         decoration: InputDecoration(
-                          label: Text('Employee Id'),
+                          label: Text('Employee Name'),
                           prefixIcon: Icon(Icons.person_2_outlined),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                         ),
                         validator: (value) =>
-                            value!.isEmpty ? 'Id required' : null,
+                            value!.isEmpty ? 'Name required' : null,
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
@@ -239,6 +239,8 @@ class RegisterState extends State<RegisterScreen> {
                                   'Register',
                                   style: GoogleFonts.montserrat(
                                     fontStyle: FontStyle.normal,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16.0
                                   ),
                                 ),
                         ),

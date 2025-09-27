@@ -106,17 +106,21 @@ class _SecurityHomeState extends ConsumerState<SecurityHome> {
 
   @override
   Widget build(BuildContext context) {
-    final userProviderValue = ref.watch(userProvider);
-    final userName = userProviderValue?.name ?? '';
+   final userAsync = ref.watch(userProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Wheel Ways'), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: userAsync.when(data: (user){
+          if(user == null) {
+            return const Center(child: Text("No user signed in"));
+          }
+       
+       return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hello $userName! Welcome.'),
+            Text('Hello ${user.name}! Welcome.'),
 
             const SizedBox(height: 20),
 
@@ -234,7 +238,11 @@ class _SecurityHomeState extends ConsumerState<SecurityHome> {
               child: _currentScreen ?? const Center(child: Text('Select a filter')),
             ),
           ],
-        ),
+        );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+      ),
       ),
     );
   }

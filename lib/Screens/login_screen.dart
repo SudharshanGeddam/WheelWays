@@ -6,10 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:wheelways/Screens/register_screen.dart';
-import 'package:wheelways/models/get_users_details.dart';
-import 'package:wheelways/pages/admin_home.dart';
-import 'package:wheelways/pages/employee_home.dart';
-import 'package:wheelways/pages/security_home.dart';
+import 'package:wheelways/models/user_service.dart';
+import 'package:wheelways/widgets/bottom_navigation_bar_widget.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -19,7 +17,6 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class LoginState extends ConsumerState<LoginScreen> {
-  final userDataGetter = GetUsersDetails();
   FirebaseFirestore db = FirebaseFirestore.instance;
   bool isLoading = false;
   bool isLoginState = false;
@@ -40,14 +37,14 @@ class LoginState extends ConsumerState<LoginScreen> {
       setState(() => isLoading = false);
       isLoginState = true;
       if (!mounted) return;
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> BottomNavigationBarWidget()));
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Login Successful.')));
       String uid = credential.user!.uid;
       if (isLoginState) {
-        getUserRole(uid);
+        UserService.getUserData(uid);
       }
-      await userDataGetter.getUserDetails(ref);
     } on FirebaseAuthException catch (e) {
       setState(() => isLoading = false);
       if (!mounted) return;
@@ -61,43 +58,12 @@ class LoginState extends ConsumerState<LoginScreen> {
       ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
       setState(() => isLoading = false);
-      if(!mounted) return;
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Something went wrong')));
-    } finally
-    {
+    } finally {
       setState(() => isLoading = false);
-    }
-  }
-
-  Future<void> getUserRole(String uid) async {
-    try {
-      DocumentReference docRef = db.collection('users').doc(uid);
-      DocumentSnapshot snapshot = await docRef.get();
-      if (snapshot.exists) {
-        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        String role = data['role'];
-        if (!mounted) return;
-        if (role.toLowerCase() == 'admin') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AdminHome()),
-          );
-        } else if (role.toLowerCase() == 'employee') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => EmployeeHome()),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SecurityHome()),
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('Error in parsing user role.');
     }
   }
 
@@ -133,7 +99,7 @@ class LoginState extends ConsumerState<LoginScreen> {
                       Text(
                         "LOGIN",
                         style: GoogleFonts.montserrat(
-                          fontSize: 18.0,
+                          fontSize: 22.0,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 3.0,
                         ),
@@ -200,6 +166,8 @@ class LoginState extends ConsumerState<LoginScreen> {
                                   "Login",
                                   style: GoogleFonts.montserrat(
                                     fontStyle: FontStyle.normal,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16.0
                                   ),
                                 ),
                         ),

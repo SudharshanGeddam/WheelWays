@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:wheelways/models/fetch_available_bikes.dart';
-import 'package:wheelways/models/user_provider.dart';
 import 'package:wheelways/pages/request_page.dart';
+import 'package:wheelways/wrapper/user_wrapper.dart';
 
 class PaginatedListScreenAvailableBikes extends ConsumerStatefulWidget {
   const PaginatedListScreenAvailableBikes({super.key});
@@ -51,8 +51,8 @@ class _PaginatedListScreenState
 
   @override
   Widget build(BuildContext context) {
-    final userProviderValue = ref.watch(userProvider);
-    final userName = userProviderValue?.name ?? '';
+    return UserAsyncWrapper(builder: (context, user){
+      final userName = user.name ?? '';
     return ListView.builder(
       controller: _scrollController,
       itemCount: fetchavailablebikes.bikes.length + 1,
@@ -134,6 +134,8 @@ class _PaginatedListScreenState
               : SizedBox();
         }
       },
+    );
+    }
     );
   }
 }

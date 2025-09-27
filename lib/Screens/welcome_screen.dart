@@ -23,17 +23,20 @@ class WelcomeScreen extends StatelessWidget {
           const SizedBox(height: 20),
           const Text(
             "WHEELWAYS",
-            style: TextStyle(letterSpacing: 35.0, fontSize: 16),
+            style: TextStyle(letterSpacing: 35.0, fontSize: 18, ),
             softWrap: false,
             overflow: TextOverflow.fade,
           ),
           const SizedBox(height: 30),
-          FilledButton(
-            onPressed: () => Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => LoginScreen()),
+         SizedBox(
+          width: 180,
+            child: FilledButton(
+              onPressed: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+              ),
+              child: Text('Get Started', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.normal),),
             ),
-            child: Text('Get Started'),
           ),
         ],
       ),

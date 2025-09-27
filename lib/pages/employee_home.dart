@@ -13,41 +13,50 @@ class EmployeeHome extends ConsumerStatefulWidget {
 }
 
 class _EmployeeHomeState extends ConsumerState<EmployeeHome> {
-  FirebaseFirestore db = FirebaseFirestore.instance;
+  final FirebaseFirestore db = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
-    final userProviderValue = ref.watch(userProvider);
-    final userName = userProviderValue?.name ?? '';
+    final userAsync = ref.watch(userProvider);
+
     return Scaffold(
-      appBar: AppBar(title: Text('Wheel Ways'), centerTitle: true),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Hello $userName! Welcome.'),
-            const SizedBox(height: 10),
-            Center(
-              child: Container(
-                padding: EdgeInsets.all(12.0),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      width: 250,
-                      height: 250,
-                      child: Lottie.asset(
-                        'assets/lotties/Bycicle delivery fast.json',
-                      ),
+        padding: const EdgeInsets.all(16.0),
+        child: userAsync.when(
+          data: (user) {
+            if (user == null) {
+              return const Center(child: Text("No user signed in"));
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Hello ${user.name}! Welcome.'),
+                const SizedBox(height: 10),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: 250,
+                          height: 250,
+                          child: Lottie.asset(
+                            'assets/lotties/Bycicle delivery fast.json',
+                          ),
+                        ),
+                        const Text('Ride Safe, Ride with Caution'),
+                      ],
                     ),
-                    const Text('Ride Safe, Ride with Caution'),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Expanded(child: PaginatedListScreenAvailableBikes()),
-          ],
+                const SizedBox(height: 10),
+                const Expanded(child: PaginatedListScreenAvailableBikes()),
+              ],
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Error: $err')),
         ),
       ),
     );

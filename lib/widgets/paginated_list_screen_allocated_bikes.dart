@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:wheelways/models/fetch_allocated_bikes.dart';
-import 'package:wheelways/models/user_provider.dart';
+import 'package:wheelways/wrapper/user_wrapper.dart';
 
 class PaginatedListScreenAllocatedBikes extends ConsumerStatefulWidget {
   const PaginatedListScreenAllocatedBikes({super.key});
@@ -50,8 +50,10 @@ class _PaginatedListScreenState
 
   @override
   Widget build(BuildContext context) {
-    final userProviderValue = ref.watch(userProvider);
-    final userName = userProviderValue?.name ?? '';
+    return UserAsyncWrapper
+    (
+      builder: (context, user){
+        final userName = user.name ?? '';
     return ListView.builder(
       controller: _scrollController,
       itemCount: fetchAllocatedBikes.bikes.length + 1,
@@ -105,6 +107,8 @@ class _PaginatedListScreenState
               : SizedBox();
         }
       },
+    );
+      }
     );
   }
 }

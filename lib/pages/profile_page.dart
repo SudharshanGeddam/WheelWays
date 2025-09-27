@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wheelways/models/user_provider.dart';
+import 'package:wheelways/wrapper/user_wrapper.dart';
 
 class ProfilePage extends ConsumerStatefulWidget{
   const ProfilePage({super.key});
@@ -12,10 +12,10 @@ class ProfilePage extends ConsumerStatefulWidget{
 class _ProfilePageState extends ConsumerState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-    final userProviderValue = ref.watch(userProvider);
-    final userName = userProviderValue?.name ?? '';
-    final userRole = userProviderValue?.role?? '';
-    final userEmail = userProviderValue?.email??'';
+    return UserAsyncWrapper(builder: (context, user){
+      final userName = user.name ?? '';
+      final userRole = user.role ?? '';
+      final userEmail = user.email ?? '';
     return Scaffold(
       body: Padding(padding: EdgeInsets.all(16.0),
       child: Column(
@@ -55,6 +55,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           
         ],
       ),),
+    );
+    }
     );
   }
 }
